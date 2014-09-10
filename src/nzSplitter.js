@@ -3,7 +3,7 @@
 
 	var directives = angular.module('net.enzey.splitter', []);
 
-	directives.directive('nzFlexResize', function ($parse, $document, $timeout) {
+	directives.directive('nzSplitter', function ($parse, $document, $timeout) {
 		return {
 			compile: function ($element, $attrs) {
 				var directiveName = this.name;
