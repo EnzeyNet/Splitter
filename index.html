@@ -1,0 +1,56 @@
+<html ng-app="net.enzey.example">
+	<head>
+		<title>Splitter Example</title>
+		<style>
+			[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+				display: none !important;
+			}
+		</style>
+		<style>
+			.scrolling {
+				height: 100%;
+				overflow: auto;
+			}
+			.selection {
+				background-color: lightblue;
+			}
+			.selection2 {
+				background-color: blue;
+			}
+			.flyoutLabel {
+				width: 50px;
+			}
+		</style>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.17/angular.js"></script>
+		<script src="dist/Splitter.js"></script>
+		<script src="example.js"></script>
+
+		<link  href="dist/Splitter.css" rel="stylesheet" type="text/css"></link>
+	</head>
+	<body ng-controller="splitterCtrl">
+
+		<div nz-splitter="EW">
+			<div>
+				blarg
+			</div>
+			<div>
+				<div nz-splitter="N">
+					<div>
+						54674565647
+					</div>
+					<div>
+						56grvtydfydcxxdvxdr sertgdfgb xdfg 
+					</div>
+					<div>
+						dfgh cfdxgd nyuhsr6tu
+					</div>
+				</div>
+			</div>
+			<div>
+				foo dfsg 456745685467n 43564 465
+			</div>
+		</div>
+
+	</body>
+</html>
