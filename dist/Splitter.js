@@ -36,14 +36,15 @@
 
 				var setupResizeOnGripper = function(gripper) {
 					gripper.on('mousedown', function(event) {
+						event.preventDefault();
 						var gripperContainer = gripper.parent();
 						var originalMouseX = event.pageX;
 						var originalMouseY = event.pageY;
 
-						var offsetXLeft =   event.originalTarget.offsetLeft;
-						var offsetXRight =  gripperContainer[0].clientWidth - event.originalTarget.clientWidth;
-						var offsetYTop =    event.originalTarget.offsetTop;
-						var offsetYBottom = gripperContainer[0].clientHeight - event.originalTarget.clientHeight;
+						var offsetXLeft =   event.target.offsetLeft;
+						var offsetXRight =  gripperContainer[0].clientWidth - event.target.clientWidth;
+						var offsetYTop =    event.target.offsetTop;
+						var offsetYBottom = gripperContainer[0].clientHeight - event.target.clientHeight;
 
 						var newX;
 						var newY;
