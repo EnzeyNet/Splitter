@@ -1,9 +1,9 @@
 (function (angular) {
     "use strict";
 
-	var directives = angular.module('net.enzey.splitter', []);
+	var directives = angular.module('net.enzey.splitter', ['net.enzey.services']);
 
-	directives.directive('nzSplitter', function ($parse, $document, $timeout) {
+	directives.directive('nzSplitter', function ($parse, $document, $timeout, nzEventHelper) {
 		return {
 			compile: function ($element, $attrs) {
 				var directiveName = this.name;
@@ -35,67 +35,56 @@
 				};
 
 				var setupResizeOnGripper = function(gripper) {
-					gripper.on('mousedown', function(event) {
-						event.preventDefault();
-						var gripperContainer = gripper.parent();
-						var originalMouseX = event.pageX;
-						var originalMouseY = event.pageY;
+					var gripperContainer = gripper.parent();
 
-						var offsetXLeft =   event.target.offsetLeft;
-						var offsetXRight =  gripperContainer[0].clientWidth - event.target.clientWidth;
-						var offsetYTop =    event.target.offsetTop;
-						var offsetYBottom = gripperContainer[0].clientHeight - event.target.clientHeight;
+					var isNorthRegion = gripperContainer.hasClass('splitterNorth');
+					var isSouthRegion = gripperContainer.hasClass('splitterSouth');
+					var isEastRegion = gripperContainer.hasClass('splitterEast');
+					var isWestRegion = gripperContainer.hasClass('splitterWest');
 
-						var newX;
-						var newY;
+					var layerX = 0;
+					var layerY = 0;
 
-						var updateContainer = function() {
-							if (gripperContainer.hasClass('splitterNorth')) {
-								var mouseMove = newY - originalMouseY;
-								var newSize = mouseMove + offsetYTop;
-								gripperContainer.css('flex-basis', Math.max(0, newSize) + 'px');
-								if ($element[0].scrollHeight > $element[0].clientHeight) {
-									gripperContainer.css('flex-basis', Math.max(0, newSize - ($element[0].scrollHeight - $element[0].clientHeight)) + 'px');
-								}
-							} else if (gripperContainer.hasClass('splitterSouth')) {
-								var mouseMove = originalMouseY - newY;
-								var newSize = mouseMove + offsetYBottom;
-								gripperContainer.css('flex-basis', Math.max(0, newSize) + 'px');
-								if ($element[0].scrollHeight > $element[0].clientHeight) {
-									gripperContainer.css('flex-basis', Math.max(0, newSize - ($element[0].scrollHeight - $element[0].clientHeight)) + 'px');
-								}
-
-							} else if (gripperContainer.hasClass('splitterEast')) {
-								var mouseMove = newX - originalMouseX;
-								var newSize = mouseMove + offsetXLeft;
-								gripperContainer.css('flex-basis', Math.max(0, newSize) + 'px');
-								if ($element[0].scrollWidth > $element[0].clientWidth) {
-									gripperContainer.css('flex-basis', Math.max(0, newSize - ($element[0].scrollWidth - $element[0].clientWidth)) + 'px');
-								}
-							} else if (gripperContainer.hasClass('splitterWest')) {
-								var mouseMove = originalMouseX - newX;
-								var newSize = mouseMove + offsetXRight;
-								gripperContainer.css('flex-basis', Math.max(0, newSize) + 'px');
-								if ($element[0].scrollWidth > $element[0].clientWidth) {
-									gripperContainer.css('flex-basis', Math.max(0, newSize - ($element[0].scrollWidth - $element[0].clientWidth)) + 'px');
-								}
+					var gripperContainerSize = null;
+					nzEventHelper.registerDragHandler(gripper,
+						// Start Drag
+						function (event) {
+							if (isNorthRegion || isSouthRegion) {
+								gripperContainerSize = gripperContainer[0].clientHeight;
+							} else if (isEastRegion || isWestRegion) {
+								gripperContainerSize = gripperContainer[0].clientWidth;
 							}
-						}
+						},
+						// Drag
+						function (xDelta, yDelta) {
+							var newSize = 0;
+							if (isNorthRegion) {
+								newSize = gripperContainerSize + yDelta - gripper[0].clientHeight;
+							} else if (isSouthRegion) {
+								newSize = gripperContainerSize - yDelta - gripper[0].clientHeight;
+							} else if (isEastRegion) {
+								newSize = gripperContainerSize - xDelta - gripper[0].clientWidth;
+							} else if (isWestRegion) {
+								newSize = gripperContainerSize + xDelta - gripper[0].clientWidth;
+							}
+							gripperContainer.css('flex-basis', Math.max(0, newSize) + 'px');
 
-						var updateFnId;
-						var moveEvent = function(event) {
-							$timeout.cancel(updateFnId);
-							newX = event.pageX;
-							newY = event.pageY;
-							var updateFnId = $timeout(updateContainer, 50, false);
-						};
-						$document.on('mousemove', moveEvent);
-						var mouseUpEvent = function(event) {
-							$document.off('mousemove', moveEvent);
-							$document.off('mouseup', mouseUpEvent);
-						};
-						$document.on('mouseup', mouseUpEvent);
-					});
+							var unusableSpace = 0;
+							if (isNorthRegion || isSouthRegion) {
+								unusableSpace = $element[0].scrollHeight - $element[0].clientHeight;
+							} else if (isEastRegion || isWestRegion) {
+								unusableSpace = $element[0].scrollWidth - $element[0].clientWidth;
+							}
+							if (unusableSpace > 0) {
+								gripperContainer.css('flex-basis', Math.max(0, newSize - unusableSpace) + 'px');
+							}
+						},
+						// End Drag
+						function (event) {
+							gripperContainerSize = null;
+						},
+						0
+					);
 				}
 
 				var gripper = angular.element('<div class="splitterResizer" draggable="true"></div>');
@@ -106,29 +95,29 @@
 					$element.addClass('splitterVerticalContainer');
 					firstChild.addClass('splitterNorth');
 					var thisGripper = gripper.clone();
-					setupResizeOnGripper(thisGripper);
 					firstChild.append(thisGripper);
+					setupResizeOnGripper(thisGripper);
 				}
 				if (isSouth(position)) {
 					$element.addClass('splitterVerticalContainer');
 					lastChild.addClass('splitterSouth');
 					var thisGripper = gripper.clone();
-					setupResizeOnGripper(thisGripper);
 					lastChild.append(thisGripper);
+					setupResizeOnGripper(thisGripper);
 				}
 				if (isEast(position)) {
 					$element.addClass('splitterHorizontalContainer');
-					firstChild.addClass('splitterEast');
+					firstChild.addClass('splitterWest');
 					var thisGripper = gripper.clone();
-					setupResizeOnGripper(thisGripper);
 					firstChild.append(thisGripper);
+					setupResizeOnGripper(thisGripper);
 				}
 				if (isWest(position)) {
 					$element.addClass('splitterHorizontalContainer');
-					lastChild.addClass('splitterWest');
+					lastChild.addClass('splitterEast');
 					var thisGripper = gripper.clone();
-					setupResizeOnGripper(thisGripper);
 					lastChild.append(thisGripper);
+					setupResizeOnGripper(thisGripper);
 				}
 
 				return {
