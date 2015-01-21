@@ -36,11 +36,11 @@
   position: relative !important;
 }
 .splitterEast {
-  padding-right: 10px !important;
+  padding-left: 10px !important;
   position: relative !important;
 }
 .splitterWest {
-  padding-left: 10px !important;
+  padding-right: 10px !important;
   position: relative !important;
 }
 .splitterNorth .splitterResizer {
@@ -50,11 +50,11 @@
   top: 0px;
 }
 .splitterEast .splitterResizer {
-  right: 0px;
+  left: 0px;
   top: 0;
 }
 .splitterWest .splitterResizer {
-  left: 0px;
+  right: 0px;
   top: 0;
 }
 .splitterNorth .splitterResizer,
