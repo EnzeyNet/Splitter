@@ -46,7 +46,7 @@
 					var layerY = 0;
 
 					var gripperContainerSize = null;
-					nzEventHelper.registerDragHandler(gripper,
+					nzEventHelper.registerMouseDragHandler(gripper,
 						// Start Drag
 						function (event) {
 							if (isNorthRegion || isSouthRegion) {
