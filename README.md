@@ -6,6 +6,8 @@ Resizable Region Splitter using FlexBox
 Angular Module: net.enzey.splitter
 Directive Name: nzSplitter
 
+Live Example: http://EnzeyNet.github.io/Splitter
+
 ### Directive Parameters
 
 | Parameter Name | Description |
